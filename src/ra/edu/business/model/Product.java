@@ -4,9 +4,12 @@ public class Product {
     private int productid;
     private String name;
     private double price;
-    private int stock;
     private String brand;
-    boolean status;
+    private int stock;
+    private boolean status;
+
+    public Product() {
+    }
 
     public int getProductid() {
         return productid;
@@ -32,14 +35,6 @@ public class Product {
         this.price = price;
     }
 
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public String getBrand() {
         return brand;
     }
@@ -48,22 +43,19 @@ public class Product {
         this.brand = brand;
     }
 
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
     public boolean isStatus() {
         return status;
     }
 
     public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public Product() {}
-
-    public Product(int productid, String name, double price, int stock, String brand, boolean status) {
-        this.productid = productid;
-        this.name = name;
-        this.price = price;
-        this.stock = stock;
-        this.brand = brand;
         this.status = status;
     }
 }

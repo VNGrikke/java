@@ -18,32 +18,31 @@ public class ConnectionDB {
                 System.out.println("Kết nối thất bại!");
             }
         } catch (SQLException e) {
-            System.out.println("Lỗi kết nối: " + e.getMessage());
+            System.out.println("\u001B[31mLỗi kết nối: " + e.getMessage() + "\u001B[0m");
         }
     }
 
     public static Connection openConnection() throws SQLException {
-        try {
-            return DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (SQLException e) {
-            System.out.println("\u001B[31m" + "Lỗi kết nối CSDL do: " + e.getMessage() + "\u001B[0m");
-            throw e; // Ném lại ngoại lệ để tầng gọi xử lý
-        }
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
     public static void closeConnection(Connection conn, CallableStatement callSt) {
         if (callSt != null) {
             try {
-                callSt.close();
+                if (!callSt.isClosed()) {
+                    callSt.close();
+                }
             } catch (SQLException e) {
-                System.out.println("\u001B[31m" + "Lỗi đóng CallableStatement: " + e.getMessage() + "\u001B[0m");
+                System.out.println("\u001B[31mLỗi đóng CallableStatement: " + e.getMessage() + "\u001B[0m");
             }
         }
         if (conn != null) {
             try {
-                conn.close();
+                if (!conn.isClosed()) {
+                    conn.close();
+                }
             } catch (SQLException e) {
-                System.out.println("\u001B[31m" + "Lỗi đóng kết nối: " + e.getMessage() + "\u001B[0m");
+                System.out.println("\u001B[31mLỗi đóng kết nối: " + e.getMessage() + "\u001B[0m");
             }
         }
     }

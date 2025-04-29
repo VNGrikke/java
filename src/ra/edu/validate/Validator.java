@@ -1,32 +1,29 @@
 package ra.edu.validate;
 
 import ra.edu.exception.ValidationException;
+import ra.edu.util.InputUtil;
+
 import java.text.SimpleDateFormat;
-import java.util.Scanner;
 
 public class Validator {
-    private static final Scanner scanner = new Scanner(System.in);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     static {
-        dateFormat.setLenient(false); // Không cho phép ngày không hợp lệ (ví dụ: 31/04)
+        dateFormat.setLenient(false);
     }
 
-    // Validate chuỗi không rỗng
     public static void validateNotEmpty(String value, String fieldName) throws ValidationException {
         if (value == null || value.trim().isEmpty()) {
             throw new ValidationException(fieldName + " không được để trống!");
         }
     }
 
-    // Validate số dương
     public static void validatePositiveNumber(double value, String fieldName) throws ValidationException {
         if (value <= 0) {
             throw new ValidationException(fieldName + " phải là số dương!");
         }
     }
 
-    // Validate email
     public static void validateEmail(String email) throws ValidationException {
         validateNotEmpty(email, "Email");
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
@@ -34,7 +31,6 @@ public class Validator {
         }
     }
 
-    // Validate ngày tháng
     public static void validateDate(String date) throws ValidationException {
         validateNotEmpty(date, "Ngày sinh");
         try {
@@ -44,7 +40,6 @@ public class Validator {
         }
     }
 
-    // Validate số điện thoại cơ bản (10-11 chữ số)
     public static void validatePhoneBasic(String phone) throws ValidationException {
         validateNotEmpty(phone, "Số điện thoại");
         if (!phone.matches("\\d{10,11}")) {
@@ -52,76 +47,58 @@ public class Validator {
         }
     }
 
-    // Phương thức prompt cho chuỗi không rỗng
     public static String promptForNotEmpty(String prompt, String fieldName) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                String value = scanner.nextLine();
-                validateNotEmpty(value, fieldName);
-                return value;
-            } catch (ValidationException e) {
-                System.out.println("\u001B[31m" + "Lỗi: " + e.getMessage() + "\u001B[0m");
-            }
+        String value = InputUtil.promptForNotEmpty(prompt);
+        try {
+            validateNotEmpty(value, fieldName);
+            return value;
+        } catch (ValidationException e) {
+            System.out.println("\u001B[31mLỗi: " + e.getMessage() + "\u001B[0m");
+            return promptForNotEmpty(prompt, fieldName);
         }
     }
 
-    // Phương thức prompt cho số dương
     public static double promptForPositiveNumber(String prompt, String fieldName) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                String input = scanner.nextLine();
-                double value = Double.parseDouble(input);
-                validatePositiveNumber(value, fieldName);
-                return value;
-            } catch (NumberFormatException e) {
-                System.out.println("\u001B[31m" + "Lỗi: " + fieldName + " phải là số hợp lệ!" + "\u001B[0m");
-            } catch (ValidationException e) {
-                System.out.println("\u001B[31m" + "Lỗi: " + e.getMessage() + "\u001B[0m");
-            }
+        double value = InputUtil.promptForPositiveNumber(prompt);
+        try {
+            validatePositiveNumber(value, fieldName);
+            return value;
+        } catch (ValidationException e) {
+            System.out.println("\u001B[31mLỗi: " + e.getMessage() + "\u001B[0m");
+            return promptForPositiveNumber(prompt, fieldName);
         }
     }
 
-    // Phương thức prompt cho email
     public static String promptForEmail(String prompt) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                String email = scanner.nextLine();
-                validateEmail(email);
-                return email;
-            } catch (ValidationException e) {
-                System.out.println("\u001B[31m" + "Lỗi: " + e.getMessage() + "\u001B[0m");
-            }
+        String email = InputUtil.promptForNotEmpty(prompt);
+        try {
+            validateEmail(email);
+            return email;
+        } catch (ValidationException e) {
+            System.out.println("\u001B[31mLỗi: " + e.getMessage() + "\u001B[0m");
+            return promptForEmail(prompt);
         }
     }
 
-    // Phương thức prompt cho ngày tháng
     public static String promptForDate(String prompt) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                String date = scanner.nextLine();
-                validateDate(date);
-                return date;
-            } catch (ValidationException e) {
-                System.out.println("\u001B[31m" + "Lỗi: " + e.getMessage() + "\u001B[0m");
-            }
+        String date = InputUtil.promptForNotEmpty(prompt);
+        try {
+            validateDate(date);
+            return date;
+        } catch (ValidationException e) {
+            System.out.println("\u001B[31mLỗi: " + e.getMessage() + "\u001B[0m");
+            return promptForDate(prompt);
         }
     }
 
-    // Phương thức prompt cho số điện thoại cơ bản
     public static String promptForPhoneBasic(String prompt) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                String phone = scanner.nextLine();
-                validatePhoneBasic(phone);
-                return phone;
-            } catch (ValidationException e) {
-                System.out.println("\u001B[31m" + "Lỗi: " + e.getMessage() + "\u001B[0m");
-            }
+        String phone = InputUtil.promptForNotEmpty(prompt);
+        try {
+            validatePhoneBasic(phone);
+            return phone;
+        } catch (ValidationException e) {
+            System.out.println("\u001B[31mLỗi: " + e.getMessage() + "\u001B[0m");
+            return promptForPhoneBasic(prompt);
         }
     }
 }

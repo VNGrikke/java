@@ -1,14 +1,14 @@
 package ra.edu.presentation;
 
 import ra.edu.business.service.Invoice.InvoiceService;
-import ra.edu.validate.Validator;
+import ra.edu.util.InputUtil;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 public class StatisticMenu {
-    private InvoiceService invoiceService;
-    private DisplayMenu displayMenu;
+    private final InvoiceService invoiceService;
+    private final DisplayMenu displayMenu;
 
     public StatisticMenu(InvoiceService invoiceService, DisplayMenu displayMenu) {
         this.invoiceService = invoiceService;
@@ -23,7 +23,7 @@ public class StatisticMenu {
             System.out.println("3. Thống kê doanh thu theo năm");
             System.out.println("0. Quay lại");
 
-            int choice = getChoice();
+            int choice = InputUtil.getChoice(0, 3);
             switch (choice) {
                 case 1:
                     displayRevenueByDay();
@@ -37,24 +37,6 @@ public class StatisticMenu {
                 case 0:
                     displayMenu.menuManager();
                     return;
-                default:
-                    System.out.println("\u001B[31m" + "Lựa chọn không hợp lệ! Vui lòng nhập lại." + "\u001B[0m");
-            }
-        }
-    }
-
-    private int getChoice() {
-        while (true) {
-            try {
-                String input = Validator.promptForNotEmpty("Nhập lựa chọn: ", "Lựa chọn");
-                int choice = Integer.parseInt(input);
-                if (choice >= 0 && choice <= 3) {
-                    return choice;
-                } else {
-                    System.out.println("\u001B[31m" + "Lựa chọn không hợp lệ! Vui lòng nhập lại." + "\u001B[0m");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("\u001B[31m" + "Lựa chọn phải là số! Vui lòng nhập lại." + "\u001B[0m");
             }
         }
     }

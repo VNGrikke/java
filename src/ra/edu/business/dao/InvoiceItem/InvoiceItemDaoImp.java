@@ -8,52 +8,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InvoiceItemDaoImp implements InvoiceItemDAO {
-
     @Override
     public void addInvoiceItem(int invoiceId, int productId, int quantity, double unitPrice) {
-        Connection conn = null;
-        CallableStatement callSt = null;
-        try {
-            conn = ConnectionDB.openConnection();
-            if (conn == null) return;
-
-            callSt = conn.prepareCall("{call add_invoice_item(?, ?, ?, ?)}");
-            callSt.setInt(1, invoiceId);
-            callSt.setInt(2, productId);
-            callSt.setInt(3, quantity);
-            callSt.setDouble(4, unitPrice);
-            callSt.execute();
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement stmt = conn.prepareCall("{CALL add_invoice_item(?,?,?,?)}")) {
+            conn.setAutoCommit(false);
+            try {
+                stmt.setInt(1, invoiceId);
+                stmt.setInt(2, productId);
+                stmt.setInt(3, quantity);
+                stmt.setDouble(4, unitPrice);
+                stmt.executeUpdate();
+                conn.commit();
+                System.out.println("Thêm chi tiết hóa đơn thành công!");
+            } catch (SQLException e) {
+                conn.rollback();
+                System.err.println("Lỗi khi thêm chi tiết hóa đơn: " + e.getMessage());
+            }
         } catch (SQLException e) {
-            System.out.println("\u001B[31m" + "Lỗi thêm chi tiết hóa đơn: " + e.getMessage() + "\u001B[0m");
-        } finally {
-            ConnectionDB.closeConnection(conn, callSt);
+            System.err.println("Lỗi khi quản lý giao dịch: " + e.getMessage());
         }
     }
 
     @Override
     public List<InvoiceItem> getInvoiceItemsByInvoiceId(int invoiceId) {
         List<InvoiceItem> items = new ArrayList<>();
-        Connection conn = null;
-        CallableStatement callSt = null;
-        try {
-            conn = ConnectionDB.openConnection();
-            if (conn == null) return items;
-
-            callSt = conn.prepareCall("SELECT * FROM invoice_items WHERE invoice_id = ?");
-            callSt.setInt(1, invoiceId);
-            ResultSet rs = callSt.executeQuery();
-            while (rs.next()) {
-                InvoiceItem item = new InvoiceItem();
-                item.setInvoice_item_id(rs.getInt("item_id"));
-                item.setProduct_id(rs.getInt("productid"));
-                item.setQuantity(rs.getInt("quantity"));
-                item.setUnit_price(rs.getDouble("unit_price"));
-                items.add(item);
+        try (Connection conn = ConnectionDB.openConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM invoice_items WHERE invoice_id = ?")) {
+            stmt.setInt(1, invoiceId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    InvoiceItem item = new InvoiceItem();
+                    item.setInvoice_item_id(rs.getInt("item_id"));
+                    item.setInvoice_id(rs.getInt("invoice_id"));
+                    item.setProduct_id(rs.getInt("productid"));
+                    item.setQuantity(rs.getInt("quantity"));
+                    item.setUnit_price(rs.getDouble("unit_price"));
+                    items.add(item);
+                }
             }
         } catch (SQLException e) {
-            System.out.println("\u001B[31m" + "Lỗi lấy danh sách chi tiết hóa đơn: " + e.getMessage() + "\u001B[0m");
-        } finally {
-            ConnectionDB.closeConnection(conn, callSt);
+            System.err.println("Lỗi khi lấy chi tiết hóa đơn: " + e.getMessage());
         }
         return items;
     }

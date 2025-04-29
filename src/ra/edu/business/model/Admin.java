@@ -5,9 +5,13 @@ public class Admin {
     private String accountName;
     private String password;
 
+    public Admin() {
+    }
+
     public int getAccountId() {
         return accountId;
     }
+
     public void setAccountId(int accountId) {
         this.accountId = accountId;
     }
@@ -27,12 +31,4 @@ public class Admin {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public Admin() {}
-
-    public Admin(int accountId, String accountName, String password) {
-        this.accountName = accountName;
-        this.password = password;
-    }
-
 }

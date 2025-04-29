@@ -1,13 +1,15 @@
 package ra.edu.business.model;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Invoice {
-    int invoiceId;
-    int customerId;
-    LocalDate created_at;
-    double total_amount;
+    private int invoiceId;
+    private int customerId;
+    private LocalDate created_at;
+    private double total_amount;
+
+    public Invoice() {
+    }
 
     public int getInvoiceId() {
         return invoiceId;
@@ -38,15 +40,6 @@ public class Invoice {
     }
 
     public void setTotal_amount(double total_amount) {
-        this.total_amount = total_amount;
-    }
-
-    public Invoice(){}
-
-    public Invoice(int invoiceId, int customerId, LocalDate created_at, double total_amount) {
-        this.invoiceId = invoiceId;
-        this.customerId = customerId;
-        this.created_at = created_at;
         this.total_amount = total_amount;
     }
 }

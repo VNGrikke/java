@@ -23,6 +23,7 @@ public class Customer {
         this.customerName = customerName;
     }
 
+
     public String getCustomerEmail() {
         return customerEmail;
     }
@@ -56,4 +57,5 @@ public class Customer {
         this.customerPhone = customerPhone;
         this.customerAddress = customerAddress;
     }
+
 }

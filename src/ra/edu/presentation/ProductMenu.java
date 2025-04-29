@@ -3,15 +3,14 @@ package ra.edu.presentation;
 import ra.edu.business.dao.Product.ProductDaoImp;
 import ra.edu.business.model.Product;
 import ra.edu.business.service.Product.ProductService;
+import ra.edu.util.InputUtil;
 import ra.edu.validate.Validator;
 
 import java.util.List;
 
-import static ra.edu.business.dao.Product.ProductDaoImp.products;
-
 public class ProductMenu {
-    private ProductService productService;
-    private DisplayMenu displayMenu;
+    private final ProductService productService;
+    private final DisplayMenu displayMenu;
 
     public ProductMenu(ProductService productService, DisplayMenu displayMenu) {
         this.productService = productService;
@@ -31,7 +30,7 @@ public class ProductMenu {
             int choice = getChoice();
             switch (choice) {
                 case 1:
-                    productService.getAllPhoneList();
+                    ProductDaoImp.displayProductList(productService.getAllPhoneList());
                     break;
                 case 2:
                     addPhone();
@@ -48,95 +47,46 @@ public class ProductMenu {
                 case 0:
                     displayMenu.menuManager();
                     return;
-                default:
-                    System.out.println("Lựa chọn không hợp lệ!");
             }
         }
     }
 
     private int getChoice() {
-        try {
-            return Integer.parseInt(Validator.promptForNotEmpty("Nhập lựa chọn: ", "Lựa chọn"));
-        } catch (NumberFormatException e) {
-            return -1;
-        } catch (Exception e) {
-            return -1;
-        }
+        return InputUtil.getChoice(0, 5);
     }
 
     private void addPhone() {
         System.out.println("Thêm mới điện thoại");
-        String name;
-        boolean isNameValid;
-        do {
-            name = Validator.promptForNotEmpty("Nhập tên điện thoại: ", "Tên điện thoại");
-            isNameValid = true;
-
-            for (Product product : products) {
-                if (product.getName().equalsIgnoreCase(name)) {
-                    System.out.println("\u001B[31m" + "Tên sản phẩm đã tồn tại, vui lòng nhập lại!" + "\u001B[0m");
-                    isNameValid = false;
-                    break;
-                }
-            }
-        } while (!isNameValid);
-
+        String name = Validator.promptForNotEmpty("Nhập tên điện thoại: ", "Tên điện thoại");
+        List<Product> existingProducts = productService.getAllPhoneList();
+        if (existingProducts.stream().anyMatch(p -> p.getName().equalsIgnoreCase(name))) {
+            System.out.println("\u001B[31mTên sản phẩm đã tồn tại, vui lòng nhập lại!\u001B[0m");
+            return;
+        }
         double price = Validator.promptForPositiveNumber("Nhập giá (USD): ", "Giá điện thoại");
         String brand = Validator.promptForNotEmpty("Nhập hãng điện thoại: ", "Hãng điện thoại");
         int stock = (int) Validator.promptForPositiveNumber("Nhập số lượng trong kho: ", "Số lượng");
-
-        try {
-            productService.addPhone(name, price, brand, stock);
-        } catch (Exception e) {
-            System.out.println("\u001B[31m" + "Lỗi khi thêm điện thoại: " + e.getMessage() + "\u001B[0m");
-        }
+        productService.addPhone(name, price, brand, stock);
     }
 
     private void updatePhone() {
         System.out.println("Sửa thông tin điện thoại:");
         int id = (int) Validator.promptForPositiveNumber("Nhập ID điện thoại: ", "ID điện thoại");
-
-        Product existingProduct = null;
-        for (Product product : products) {
-            if (product.getProductid() == id) {
-                existingProduct = product;
-                break;
-            }
-        }
-
-        if (existingProduct == null) {
-            System.out.println("\u001B[31m" + "Không tìm thấy điện thoại với ID: " + id + "\u001B[0m");
+        List<Product> existingProducts = productService.getAllPhoneList();
+        if (existingProducts.stream().noneMatch(p -> p.getProductid() == id)) {
+            System.out.println("\u001B[31mKhông tìm thấy điện thoại với ID: " + id + "\u001B[0m");
             return;
         }
-
-        String name;
-        boolean isNameValid;
-        do {
-            name = Validator.promptForNotEmpty("Nhập tên điện thoại: ", "Tên điện thoại");
-            isNameValid = true;
-            if (existingProduct.getName().equalsIgnoreCase(name)) {
-                break;
-            }
-            for (Product product : products) {
-                if (product.getName().equalsIgnoreCase(name)) {
-                    System.out.println("\u001B[31m" + "Tên sản phẩm đã tồn tại, vui lòng nhập lại!" + "\u001B[0m");
-                    isNameValid = false;
-                    break;
-                }
-            }
-        } while (!isNameValid);
-
+        String name = Validator.promptForNotEmpty("Nhập tên điện thoại: ", "Tên điện thoại");
+        if (existingProducts.stream().anyMatch(p -> p.getName().equalsIgnoreCase(name) && p.getProductid() != id)) {
+            System.out.println("\u001B[31mTên sản phẩm đã tồn tại, vui lòng nhập lại!\u001B[0m");
+            return;
+        }
         double price = Validator.promptForPositiveNumber("Nhập giá (USD): ", "Giá điện thoại");
         String brand = Validator.promptForNotEmpty("Nhập hãng điện thoại: ", "Hãng điện thoại");
         int stock = (int) Validator.promptForPositiveNumber("Nhập số lượng trong kho: ", "Số lượng");
-        try {
-            productService.updatePhone(id, name, price, brand, stock);
-            System.out.println("\u001B[32m" + "Cập nhật thành công!" + "\u001B[0m");
-        } catch (Exception e) {
-            System.out.println("\u001B[31m" + "Lỗi khi cập nhật điện thoại: " + e.getMessage() + "\u001B[0m");
-        }
+        productService.updatePhone(id, name, price, brand, stock);
     }
-
 
     private void deletePhone() {
         System.out.println("Xóa điện thoại:");
@@ -165,8 +115,6 @@ public class ProductMenu {
                     break;
                 case 0:
                     return;
-                default:
-                    System.out.println("Lựa chọn không hợp lệ!");
             }
         }
     }
@@ -174,24 +122,20 @@ public class ProductMenu {
     private void findPhoneByBrand() {
         String brand = Validator.promptForNotEmpty("Nhập hãng điện thoại: ", "Hãng điện thoại");
         List<Product> products = productService.findPhoneByBrand(brand);
-        displayProducts(products);
+        ProductDaoImp.displayProductList(products);
     }
 
     private void findPhoneByPriceRange() {
         double minPrice = Validator.promptForPositiveNumber("Nhập giá tối thiểu (USD): ", "Giá tối thiểu");
         double maxPrice = Validator.promptForPositiveNumber("Nhập giá tối đa (USD): ", "Giá tối đa");
         List<Product> products = productService.findPhoneByPriceRange(minPrice, maxPrice);
-        displayProducts(products);
+        ProductDaoImp.displayProductList(products);
     }
 
     private void findPhoneByStock() {
         int minStock = (int) Validator.promptForPositiveNumber("Nhập tồn kho tối thiểu: ", "Tồn kho tối thiểu");
         int maxStock = (int) Validator.promptForPositiveNumber("Nhập tồn kho tối đa: ", "Tồn kho tối đa");
         List<Product> products = productService.findPhoneByStock(minStock, maxStock);
-        displayProducts(products);
-    }
-
-    private void displayProducts(List<Product> products) {
         ProductDaoImp.displayProductList(products);
     }
 }

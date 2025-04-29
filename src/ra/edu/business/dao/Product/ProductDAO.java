@@ -5,7 +5,7 @@ import ra.edu.business.model.Product;
 import java.util.List;
 
 public interface ProductDAO {
-    void getAllPhoneList();
+    List<Product> getAllPhoneList();
     void addPhone(String name, double price, String brand, int stock);
     void updatePhone(int productId, String name, double price, String brand, int stock);
     void deletePhone(int productId);
